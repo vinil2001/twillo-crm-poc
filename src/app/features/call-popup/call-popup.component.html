@@ -1,0 +1,64 @@
+<div class="call-popup-overlay" *ngIf="visible" (click)="close()">
+  <div class="call-popup" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <h2>📞 Incoming Call</h2>
+      <button class="close-btn" (click)="close()">&times;</button>
+    </div>
+    
+    <div class="popup-body">
+      <div class="call-info">
+        <div class="phone-number">
+          <strong>Number:</strong> {{ fromNumber }}
+        </div>
+        <div class="call-time">
+          <strong>Time:</strong> {{ callTime | date:'HH:mm:ss' }}
+        </div>
+      </div>
+
+      <div class="customer-info" *ngIf="customer; else noCustomer">
+        <h3>Customer Information</h3>
+        <div class="customer-details">
+          <div class="detail-row">
+            <span class="label">Name:</span>
+            <span class="value">{{ customer.name }}</span>
+          </div>
+          <div class="detail-row" *ngIf="customer.email">
+            <span class="label">Email:</span>
+            <span class="value">{{ customer.email }}</span>
+          </div>
+          <div class="detail-row" *ngIf="customer.accountId">
+            <span class="label">Account ID:</span>
+            <span class="value">{{ customer.accountId }}</span>
+          </div>
+          <div class="detail-row" *ngIf="customer.notes">
+            <span class="label">Notes:</span>
+            <span class="value">{{ customer.notes }}</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noCustomer>
+        <div class="no-customer">
+          <h3>⚠️ Customer Not Found</h3>
+          <p>Number {{ fromNumber }} not found in database</p>
+        </div>
+      </ng-template>
+
+      <div class="loading" *ngIf="loading">
+        <p>🔄 Loading customer data...</p>
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <button class="btn btn-answer" (click)="answerCall()">
+        📞 Answer
+      </button>
+      <button class="btn btn-decline" (click)="declineCall()">
+        📵 Decline
+      </button>
+      <button class="btn btn-dismiss" (click)="close()">
+        ❌ Close
+      </button>
+    </div>
+  </div>
+</div>

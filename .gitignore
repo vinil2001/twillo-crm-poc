@@ -40,3 +40,20 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# .NET
+backend/TwilioCrmApi/bin/
+backend/TwilioCrmApi/obj/
+backend/TwilioCrmApi/appsettings.Development.json
+*.user
+*.suo
+*.cache
+*.docstates
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Twilio credentials (security)
+**/appsettings.Development.json
+**/appsettings.Production.json
