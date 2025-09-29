@@ -21,7 +21,7 @@ export class CustomerService {
       params: { number: phone } 
     }).pipe(
       catchError(error => {
-        console.error('Помилка отримання даних клієнта:', error);
+        console.error('Error fetching customer data:', error);
         return of(null);
       })
     );

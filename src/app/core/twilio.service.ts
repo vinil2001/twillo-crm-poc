@@ -13,56 +13,56 @@ export class TwilioService {
 
   async init(identity: string, apiBaseUrl: string): Promise<void> {
     try {
-      // Отримати токен з бекенду
+      // Get token from backend
       const token = await this.http.get(`${apiBaseUrl}/api/twilio/token`, {
         params: { identity },
         responseType: 'text'
       }).toPromise();
 
       if (!token) {
-        throw new Error('Не вдалося отримати Twilio токен');
+        throw new Error('Failed to obtain Twilio token');
       }
 
-      // Ініціалізувати Twilio Device
+      // Initialize Twilio Device
       this.device = new Device(token, { 
         logLevel: 'error'
       });
 
-      // Обробники подій
+      // Event handlers
       this.device.on('ready', () => {
-        console.log('Twilio Device готовий');
+        console.log('Twilio Device is ready');
         this.deviceReady$.next(true);
       });
 
       this.device.on('error', (error) => {
-        console.error('Помилка Twilio Device:', error);
+        console.error('Twilio Device error:', error);
         this.deviceReady$.next(false);
       });
 
       this.device.on('incoming', (call: Call) => {
-        console.log('Вхідний дзвінок через Twilio Device:', call);
+        console.log('Incoming call via Twilio Device:', call);
         const from = call.parameters?.['From'] || '';
         const callSid = call.parameters?.['CallSid'] || '';
         this.incoming$.next({ from, callSid });
       });
 
       this.device.on('disconnect', () => {
-        console.log('Twilio Device відключено');
+        console.log('Twilio Device disconnected');
         this.deviceReady$.next(false);
       });
 
-      // Зареєструвати пристрій
+      // Register device
       await this.device.register();
 
     } catch (error) {
-      console.error('Помилка ініціалізації Twilio:', error);
+      console.error('Twilio initialization error:', error);
       throw error;
     }
   }
 
   async makeCall(to: string): Promise<Call | null> {
     if (!this.device || !this.deviceReady$.value) {
-      console.error('Twilio Device не готовий');
+      console.error('Twilio Device is not ready');
       return null;
     }
 
@@ -72,7 +72,7 @@ export class TwilioService {
       });
       return call;
     } catch (error) {
-      console.error('Помилка здійснення дзвінка:', error);
+      console.error('Error making a call:', error);
       return null;
     }
   }

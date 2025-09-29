@@ -20,10 +20,10 @@ public class CustomersController : ControllerBase
     {
         if (string.IsNullOrEmpty(number))
         {
-            return BadRequest("Номер телефону є обов'язковим параметром");
+            return BadRequest("Phone number is a required parameter");
         }
 
-        _logger.LogInformation("Пошук клієнта за номером: {PhoneNumber}", number);
+        _logger.LogInformation("Searching customer by phone: {PhoneNumber}", number);
 
         try
         {
@@ -31,26 +31,26 @@ public class CustomersController : ControllerBase
             
             if (customer == null)
             {
-                _logger.LogInformation("Клієнта з номером {PhoneNumber} не знайдено", number);
+                _logger.LogInformation("Customer with phone {PhoneNumber} not found", number);
                 return NotFound();
             }
 
-            _logger.LogInformation("Знайдено клієнта: {CustomerName} для номера {PhoneNumber}", 
+            _logger.LogInformation("Found customer: {CustomerName} for phone {PhoneNumber}", 
                 customer.Name, number);
             
             return Ok(customer);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Помилка пошуку клієнта за номером {PhoneNumber}", number);
-            return StatusCode(500, "Помилка пошуку клієнта");
+            _logger.LogError(ex, "Error searching for customer by phone {PhoneNumber}", number);
+            return StatusCode(500, "Error searching for customer");
         }
     }
 
     [HttpGet]
     public ActionResult<IEnumerable<Customer>> GetAll()
     {
-        _logger.LogInformation("Отримання списку всіх клієнтів");
+        _logger.LogInformation("Retrieving all customers");
 
         try
         {
@@ -59,19 +59,19 @@ public class CustomersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Помилка отримання списку клієнтів");
-            return StatusCode(500, "Помилка отримання списку клієнтів");
+            _logger.LogError(ex, "Error retrieving customers list");
+            return StatusCode(500, "Error retrieving customers list");
         }
     }
 
     [HttpPost]
     public ActionResult<Customer> Create([FromBody] CreateCustomerRequest request)
     {
-        _logger.LogInformation("Створення нового клієнта: {CustomerName}", request.Name);
+        _logger.LogInformation("Creating new customer: {CustomerName}", request.Name);
 
-        // Примітка: InMemoryRepository не підтримує створення, 
-        // це буде реалізовано при переході на реальну БД
-        return StatusCode(501, "Створення клієнтів поки не підтримується в PoC версії");
+        // Note: InMemoryRepository does not support creation.
+        // This will be implemented when moving to a real DB.
+        return StatusCode(501, "Customer creation is not supported in the PoC version");
     }
 }
 
@@ -83,3 +83,4 @@ public record CreateCustomerRequest
     public string? AccountId { get; init; }
     public string? Notes { get; init; }
 }
+

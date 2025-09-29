@@ -32,7 +32,7 @@ public class TwilioController : ControllerBase
 
         try
         {
-            // Транслювати подію про вхідний дзвінок через SignalR
+            // Broadcast incoming call event via SignalR
             await _hubContext.Clients.All.SendAsync("incomingCall", new
             {
                 fromNumber = request.From,
@@ -63,12 +63,12 @@ public class TwilioController : ControllerBase
     {
         if (string.IsNullOrEmpty(identity))
         {
-            return BadRequest("Identity is required parameter");
+            return BadRequest("Identity is a required parameter");
         }
 
         try
         {
-            // Створити Twilio Access Token
+            // Create Twilio Access Token
             var grants = new HashSet<IGrant>
             {
                 new VoiceGrant
@@ -89,19 +89,19 @@ public class TwilioController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Помилка створення Twilio токена для identity: {Identity}", identity);
-            return StatusCode(500, "Помилка створення токена");
+            _logger.LogError(ex, "Error creating Twilio token for identity: {Identity}", identity);
+            return StatusCode(500, "Error creating token");
         }
     }
 
     [HttpPost("test/incoming-call")]
     public async Task<IActionResult> TestIncomingCall([FromBody] TestCallRequest request)
     {
-        _logger.LogInformation("Тестовий вхідний дзвінок з номера: {From}", request.FromNumber);
+        _logger.LogInformation("Test incoming call from number: {From}", request.FromNumber);
 
         try
         {
-            // Транслювати тестову подію через SignalR
+            // Broadcast test event via SignalR
             await _hubContext.Clients.All.SendAsync("incomingCall", new
             {
                 fromNumber = request.FromNumber,
@@ -109,12 +109,12 @@ public class TwilioController : ControllerBase
                 timestampUtc = DateTime.UtcNow
             });
 
-            return Ok(new { message = "Тестовий дзвінок надіслано" });
+            return Ok(new { message = "Test call sent" });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Помилка відправки тестового дзвінка");
-            return StatusCode(500, "Помилка відправки тестового дзвінка");
+            _logger.LogError(ex, "Error sending test call");
+            return StatusCode(500, "Error sending test call");
         }
     }
 }
@@ -131,3 +131,4 @@ public record TestCallRequest
 {
     public string FromNumber { get; init; } = "";
 }
+

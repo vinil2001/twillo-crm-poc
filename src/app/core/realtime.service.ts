@@ -20,13 +20,13 @@ export class RealTimeService {
       .build();
 
     this.hub.on('incomingCall', (payload: IncomingCallPayload) => {
-      console.log('Отримано вхідний дзвінок:', payload);
+      console.log('Incoming call received:', payload);
       this.incomingCall$.next(payload);
     });
 
     this.hub.start()
-      .then(() => console.log('SignalR підключено'))
-      .catch(err => console.error('Помилка підключення SignalR:', err));
+      .then(() => console.log('SignalR connected'))
+      .catch(err => console.error('SignalR connection error:', err));
   }
 
   stop(): void {

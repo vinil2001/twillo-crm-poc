@@ -23,14 +23,14 @@ export class CallPopupComponent {
   callTime = new Date();
 
   ngOnInit() {
-    // Оновити час дзвінка при показі попапа
+    // Update call time when popup is shown
     if (this.visible) {
       this.callTime = new Date();
     }
   }
 
   ngOnChanges() {
-    // Оновити час дзвінка при зміні видимості
+    // Update call time when visibility changes
     if (this.visible) {
       this.callTime = new Date();
     }
@@ -42,12 +42,12 @@ export class CallPopupComponent {
   }
 
   answerCall(): void {
-    console.log('Відповісти на дзвінок:', this.callSid);
+    console.log('Answer call:', this.callSid);
     this.answerClicked.emit();
   }
 
   declineCall(): void {
-    console.log('Відхилити дзвінок:', this.callSid);
+    console.log('Decline call:', this.callSid);
     this.declineClicked.emit();
   }
 }
