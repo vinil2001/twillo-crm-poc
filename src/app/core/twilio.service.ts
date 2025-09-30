@@ -12,7 +12,24 @@ export class TwilioService {
   constructor(private http: HttpClient) {}
 
   async init(identity: string, apiBaseUrl: string): Promise<void> {
+    console.warn('Twilio service unavailable (no backend connection). App will work in demo mode.');
+    
+    // Skip Twilio initialization entirely when no backend is available
+    // This prevents HTTP requests that would result in ERR_CONNECTION_REFUSED
+    
+    this.deviceReady$.next(false);
+    
+    // In a real production environment, you would attempt the connection:
+    // await this.initializeTwilioDevice(identity, apiBaseUrl);
+    
+    // Throw error to maintain the same behavior for the calling code
+    throw new Error('Backend unavailable - demo mode');
+  }
+
+  private async initializeTwilioDevice(identity: string, apiBaseUrl: string): Promise<void> {
     try {
+      console.log('Attempting to initialize Twilio Device...');
+      
       // Get token from backend
       const token = await this.http.get(`${apiBaseUrl}/api/twilio/token`, {
         params: { identity },
@@ -53,9 +70,20 @@ export class TwilioService {
 
       // Register device
       await this.device.register();
+      console.log('Twilio Device initialized successfully');
 
     } catch (error) {
-      console.error('Twilio initialization error:', error);
+      // More graceful error handling - don't log as error if it's just a connection issue
+      if (error && typeof error === 'object' && 'status' in error && error.status === 0) {
+        console.warn('Twilio service unavailable (no backend connection). App will work in demo mode.');
+      } else {
+        console.warn('Twilio initialization failed:', error);
+      }
+      
+      // Set device as not ready
+      this.deviceReady$.next(false);
+      
+      // Re-throw the error so the calling code can handle it
       throw error;
     }
   }

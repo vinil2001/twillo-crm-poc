@@ -1,64 +1,79 @@
-<div class="call-popup-overlay" *ngIf="visible" (click)="close()">
-  <div class="call-popup" (click)="$event.stopPropagation()">
-    <div class="popup-header">
-      <h2>📞 Incoming Call</h2>
-      <button class="close-btn" (click)="close()">&times;</button>
-    </div>
-    
-    <div class="popup-body">
-      <div class="call-info">
-        <div class="phone-number">
-          <strong>Number:</strong> {{ fromNumber }}
-        </div>
-        <div class="call-time">
-          <strong>Time:</strong> {{ callTime | date:'HH:mm:ss' }}
-        </div>
-      </div>
+<div class="call-popup-overlay" *ngIf="visible" (click)="close()" aria-hidden="false" role="dialog">
+  <div class="call-popup" (click)="$event.stopPropagation()" aria-modal="true" aria-label="Incoming call">
+    <!-- Header -->
+    <header class="popup-header">
+      <h2 class="popup-title">📞 Incoming Call</h2>
+      <button class="close-btn" (click)="close()" aria-label="Close popup">&times;</button>
+    </header>
 
-      <div class="customer-info" *ngIf="customer; else noCustomer">
-        <h3>Customer Information</h3>
-        <div class="customer-details">
-          <div class="detail-row">
-            <span class="label">Name:</span>
-            <span class="value">{{ customer.name }}</span>
-          </div>
-          <div class="detail-row" *ngIf="customer.email">
-            <span class="label">Email:</span>
-            <span class="value">{{ customer.email }}</span>
-          </div>
-          <div class="detail-row" *ngIf="customer.accountId">
-            <span class="label">Account ID:</span>
-            <span class="value">{{ customer.accountId }}</span>
-          </div>
-          <div class="detail-row" *ngIf="customer.notes">
-            <span class="label">Notes:</span>
-            <span class="value">{{ customer.notes }}</span>
-          </div>
+    <!-- Caller summary -->
+    <section class="caller">
+      <div class="avatar" aria-hidden="true">{{ (fromNumber || '?') | slice:-2 }}</div>
+      <div class="caller-meta">
+        <div class="number" title="Caller number">{{ fromNumber }}</div>
+        <div class="subtle">
+          <span class="badge ringing">Ringing</span>
+          <span class="dot">•</span>
+          <span>{{ callTime | date:'HH:mm:ss' }}</span>
         </div>
       </div>
+    </section>
 
-      <ng-template #noCustomer>
-        <div class="no-customer">
-          <h3>⚠️ Customer Not Found</h3>
-          <p>Number {{ fromNumber }} not found in database</p>
-        </div>
-      </ng-template>
-
-      <div class="loading" *ngIf="loading">
-        <p>🔄 Loading customer data...</p>
+    <!-- Body -->
+    <section class="popup-body">
+      <!-- Loading state -->
+      <div class="loading" *ngIf="loading" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span>
+        <p>Loading customer data...</p>
       </div>
-    </div>
 
-    <div class="popup-actions">
-      <button class="btn btn-answer" (click)="answerCall()">
-        📞 Answer
+      <!-- Customer data (only show when not loading) -->
+      <div *ngIf="!loading">
+        <div class="customer-info" *ngIf="customer; else noCustomer">
+          <h3>Customer</h3>
+          <div class="customer-grid">
+            <div class="row">
+              <span class="label">Name</span>
+              <span class="value">{{ customer.name }}</span>
+            </div>
+            <div class="row" *ngIf="customer.email">
+              <span class="label">Email</span>
+              <span class="value">{{ customer.email }}</span>
+            </div>
+            <div class="row" *ngIf="customer.accountId">
+              <span class="label">Account ID</span>
+              <span class="value">{{ customer.accountId }}</span>
+            </div>
+            <div class="row" *ngIf="customer.notes">
+              <span class="label">Notes</span>
+              <span class="value">{{ customer.notes }}</span>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noCustomer>
+          <div class="no-customer" role="note">
+            <h3>⚠️ Customer Not Found</h3>
+            <p>Number {{ fromNumber }} was not found in the database.</p>
+          </div>
+        </ng-template>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <footer class="popup-actions">
+      <button class="btn btn-answer" (click)="answerCall()" aria-label="Answer call">
+        <span class="icon">📞</span>
+        <span>Answer</span>
       </button>
-      <button class="btn btn-decline" (click)="declineCall()">
-        📵 Decline
+      <button class="btn btn-decline" (click)="declineCall()" aria-label="Decline call">
+        <span class="icon">📵</span>
+        <span>Decline</span>
       </button>
-      <button class="btn btn-dismiss" (click)="close()">
-        ❌ Close
+      <button class="btn btn-dismiss" (click)="close()" aria-label="Close">
+        <span class="icon">❌</span>
+        <span>Close</span>
       </button>
-    </div>
+    </footer>
   </div>
 </div>

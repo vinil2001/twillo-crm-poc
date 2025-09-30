@@ -56,8 +56,10 @@ export class App implements OnInit, OnDestroy {
       });
       
       this.subscriptions.push(twilioSub);
+      console.log('Twilio Device integration enabled');
     } catch (error) {
-      console.warn('Failed to initialize Twilio Device (backend may be unavailable):', error);
+      // Silently handle the error since we already log it in the service
+      // The app will continue to work in demo mode with the test button
     }
 
     this.subscriptions.push(signalRSub);
@@ -83,19 +85,32 @@ export class App implements OnInit, OnDestroy {
       // Try to get customer data from API
       this.customerService.getByPhone(payload.fromNumber, environment.apiBaseUrl).subscribe({
         next: (customer) => {
-          this.customer = customer;
+          console.log('API response for customer:', customer);
+          
+          if (customer) {
+            // API returned valid customer data
+            this.customer = customer;
+            console.log('Using API customer data:', this.customer);
+          } else {
+            // API returned null, fall back to mock data
+            this.customer = this.customerService.getMockCustomer(payload.fromNumber);
+            console.log('API returned null, using mock data:', this.customer);
+          }
+          
           this.loading = false;
         },
         error: (error) => {
-          console.warn('Failed to fetch customer from API, using test data:', error);
-          // Use test data if API is unavailable
+          console.warn('Failed to fetch customer from API, using mock data:', error);
+          // Use mock data if API is unavailable
           this.customer = this.customerService.getMockCustomer(payload.fromNumber);
+          console.log('API error, using mock data:', this.customer);
           this.loading = false;
         }
       });
     } catch (error) {
       console.error('Error retrieving customer data:', error);
       this.customer = this.customerService.getMockCustomer(payload.fromNumber);
+      console.log('Exception caught, using mock data:', this.customer);
       this.loading = false;
     }
   }

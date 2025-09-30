@@ -5,13 +5,13 @@ using Twilio.TwiML;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Додати сервіси
+// Add services
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Конфігурація CORS для Angular
+// CORS configuration for Angular
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -23,15 +23,15 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Конфігурація Twilio
+// Twilio configuration
 builder.Services.Configure<TwilioConfig>(builder.Configuration.GetSection("Twilio"));
 
-// Додати репозиторій клієнтів (в пам'яті для PoC)
+// Add customers repository (in-memory for PoC)
 builder.Services.AddSingleton<ICustomerRepository, InMemoryCustomerRepository>();
 
 var app = builder.Build();
 
-// Конфігурація pipeline
+// Pipeline configuration
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -47,7 +47,7 @@ app.MapHub<CallsHub>("/hubs/calls");
 
 app.Run();
 
-// SignalR Hub для трансляції подій дзвінків
+// SignalR Hub to broadcast call events
 public class CallsHub : Hub
 {
     public async Task JoinGroup(string groupName)
@@ -56,7 +56,7 @@ public class CallsHub : Hub
     }
 }
 
-// Конфігурація Twilio
+// Twilio configuration model
 public class TwilioConfig
 {
     public string AccountSid { get; set; } = "";
@@ -65,7 +65,7 @@ public class TwilioConfig
     public string TwiMlAppSid { get; set; } = "";
 }
 
-// Модель клієнта
+// Customer model
 public record Customer
 {
     public string Id { get; set; } = "";
@@ -76,14 +76,14 @@ public record Customer
     public string? Notes { get; set; }
 }
 
-// Інтерфейс репозиторію
+// Repository interface
 public interface ICustomerRepository
 {
     Customer? GetByPhone(string phone);
     IEnumerable<Customer> GetAll();
 }
 
-// Репозиторій в пам'яті для PoC
+// In-memory repository for PoC
 public class InMemoryCustomerRepository : ICustomerRepository
 {
     private static readonly List<Customer> _customers = new()
@@ -137,3 +137,4 @@ public class InMemoryCustomerRepository : ICustomerRepository
     public Customer? GetByPhone(string phone) => _customers.FirstOrDefault(c => c.Phone == phone);
     public IEnumerable<Customer> GetAll() => _customers;
 }
+

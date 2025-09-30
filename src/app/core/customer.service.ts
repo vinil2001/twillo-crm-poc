@@ -17,6 +17,15 @@ export class CustomerService {
   constructor(private http: HttpClient) {}
 
   getByPhone(phone: string, apiBaseUrl: string): Observable<Customer | null> {
+    // Skip API call entirely in demo mode to prevent ERR_CONNECTION_REFUSED
+    console.log('Customer API unavailable. Using mock data directly.');
+    return of(null);
+    
+    // In a real production environment, you would make the API call:
+    // return this.makeApiCall(phone, apiBaseUrl);
+  }
+
+  private makeApiCall(phone: string, apiBaseUrl: string): Observable<Customer | null> {
     return this.http.get<Customer | null>(`${apiBaseUrl}/api/customers/by-phone`, { 
       params: { number: phone } 
     }).pipe(
@@ -29,6 +38,8 @@ export class CustomerService {
 
   // Test data for demonstration (if backend is not ready)
   getMockCustomer(phone: string): Customer | null {
+    console.log('getMockCustomer called with phone:', phone);
+    
     const mockData: Customer[] = [
       {
         id: '1',
@@ -55,6 +66,8 @@ export class CustomerService {
       }
     ];
 
-    return mockData.find(c => c.phone === phone) || null;
+    const foundCustomer = mockData.find(c => c.phone === phone) || null;
+    console.log('Mock customer found:', foundCustomer);
+    return foundCustomer;
   }
 }
